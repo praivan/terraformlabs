@@ -323,6 +323,10 @@ variable "rg_location" {
   description = "Azure resource group location"
   type        = string
 }
+variable "random_id" {
+  description = "Azure resource group location"
+  type        = string
+}
 ```
 
 ... and append the following the outputs that are going to be used by Azure Synapse Analytics:
@@ -337,7 +341,7 @@ output "synapsedl_id" {
 ```
 # Create Azure Synapse Analytics workspace
 resource "azurerm_synapse_workspace" "synapse" {
-  name                                 = "asaworkshop"
+  name                                 = "asaw${var.random_id}"
   resource_group_name                  = var.rg_name
   location                             = var.rg_location
   storage_data_lake_gen2_filesystem_id = var.synapsedl_id
@@ -364,6 +368,11 @@ variable "synapsedl_id" {
   description = "Azure resource group location"
   type        = string
 }
+variable "random_id" {
+  description = "random ID"
+  type        = string
+}
+
 ```
 
 22. Now when you've got all the modules configured properly, you need to clean up the ```main.tf``` configuration file in the root folder and instruct it to use the modules you've created. To do so, navigate back to your root folder (should be in C:/Terraform if you've have followed the instructions) and open ```main.tf``` file.  The first thing you need to do is to get rid of all the unnecssary code, and delete everything *after* configuration of the Microsoft Azure provider. That being said, your code in ```main.tf``` should look like this:
@@ -440,6 +449,7 @@ module "analytics"{
   rg_name= module.resource_group.rg_name
   rg_location = module.resource_group.rg_location
   synapsedl_id = module.storage.synapsedl_id
+  random_id = module.randomizer.random_id
 }
 ```
 
