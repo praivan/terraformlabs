@@ -13,7 +13,7 @@ cd modules
 mkdir randomizer
 mkdir resource_group
 mkdir network
-mkdir compute
+#mkdir compute
 mkdir storage
 mkdir analytics
 ``` 
@@ -26,9 +26,9 @@ cd ../storage
 cd .> main.tf
 cd .> output.tf
 cd .> variables.tf
-cd ../compute
-cd .> main.tf
-cd .> variables.tf
+#cd ../compute
+#cd .> main.tf
+#cd .> variables.tf
 cd ../randomizer
 cd .> main.tf
 cd .> output.tf
@@ -164,82 +164,82 @@ output "nsg_id" {
 
 18. Now it is time to define compute module, and to do so, navigate to modules/compute folder, open the ```main.tf```, and append the following code where you are going to create a ssh key to connect to your Linux VM, network interface for your VM(and connect yor NIC with NSG). You may notice that something is bit different in this case. We add the block with the azapi provider again, and that is because Terraform handles providers as part of hashicorp namespace by default, and all the other modules must be specified inside the modules they are being used. The complete configuration code for compute is as follows: 
 ```
-terraform {
-  required_providers {
-    azapi = {
-      source  = "azure/azapi"
-      version = "~>1.5"
-    }
-  }
-}
-# Create SSH key
-resource "azapi_resource_action" "ssh_public_key_gen" {
-  type        = "Microsoft.Compute/sshPublicKeys@2022-11-01"
-  resource_id = azapi_resource.ssh_public_key.id
-  action      = "generateKeyPair"
-  method      = "POST"
-
-  response_export_values = ["publicKey", "privateKey"]
-}
-
-resource "azapi_resource" "ssh_public_key" {
-  type      = "Microsoft.Compute/sshPublicKeys@2022-11-01"
-  name      = var.ssh_id
-  location  = var.rg_location
-  parent_id = var.rg_id
-}
-
-output "key_data" {
-  value = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
-}
-
-# Create a network interface that is going to be used for a VM
-resource "azurerm_network_interface" "nic1" {
-  name                = "vm-nic"
-  location            = var.rg_location
-  resource_group_name = var.rg_name
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = var.subnet_id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = var.public_ip
-  }
-}
-
-# Connect the security group to the network interface
-resource "azurerm_network_interface_security_group_association" "nsg_to_nic" {
-  network_interface_id      = azurerm_network_interface.nic1.id
-  network_security_group_id = azurerm_network_security_group.my_nsg.id
-}
-# Create a virtual machine based on Ubuntu Linux distribution
-resource "azurerm_linux_virtual_machine" "vm1" {
-  name                = "vmlinux"
-  resource_group_name = var.rg_name
-  location            = var.rg_location
-  size                = "Standard_F2"
-  admin_username      = "adminuser"
-  network_interface_ids = [
-    azurerm_network_interface.nic1.id,
-  ]
-
- admin_ssh_key {
-    username   = "adminuser"
-    public_key = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
-  }
-}
+#terraform {
+#  required_providers {
+#    azapi = {
+#      source  = "azure/azapi"
+#      version = "~>1.5"
+#    }
+#  }
+#}
+## Create SSH key
+#resource "azapi_resource_action" "ssh_public_key_gen" {
+#  type        = "Microsoft.Compute/sshPublicKeys@2022-11-01"
+#  resource_id = azapi_resource.ssh_public_key.id
+#  action      = "generateKeyPair"
+#  method      = "POST"
+#
+#  response_export_values = ["publicKey", "privateKey"]
+#}
+#
+#resource "azapi_resource" "ssh_public_key" {
+#  type      = "Microsoft.Compute/sshPublicKeys@2022-11-01"
+#  name      = var.ssh_id
+#  location  = var.rg_location
+#  parent_id = var.rg_id
+#}
+#
+#output "key_data" {
+#  value = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
+#}
+#
+## Create a network interface that is going to be used for a VM
+#resource "azurerm_network_interface" "nic1" {
+#  name                = "vm-nic"
+#  location            = var.rg_location
+#  resource_group_name = var.rg_name
+#
+#  ip_configuration {
+#    name                          = "internal"
+#    subnet_id                     = var.subnet_id
+#    private_ip_address_allocation = "Dynamic"
+#    public_ip_address_id          = var.public_ip
+#  }
+#}
+#
+## Connect the security group to the network interface
+#resource "azurerm_network_interface_security_group_association" "nsg_to_nic" {
+#  network_interface_id      = azurerm_network_interface.nic1.id
+#  network_security_group_id = azurerm_network_security_group.my_nsg.id
+#}
+## Create a virtual machine based on Ubuntu Linux distribution
+#resource "azurerm_linux_virtual_machine" "vm1" {
+#  name                = "vmlinux"
+#  resource_group_name = var.rg_name
+#  location            = var.rg_location
+#  size                = "Standard_F2"
+#  admin_username      = "adminuser"
+#  network_interface_ids = [
+#    azurerm_network_interface.nic1.id,
+#  ]
+#
+# admin_ssh_key {
+#    username   = "adminuser"
+#    public_key = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
+#  }
+#
+#  os_disk {
+#    caching              = "ReadWrite"
+#    storage_account_type = "Standard_LRS"
+#  }
+#
+#  source_image_reference {
+#    publisher = "Canonical"
+#    offer     = "0001-com-ubuntu-server-jammy"
+#    sku       = "22_04-lts"
+#    version   = "latest"
+#  }
+#} 
 
 ```
 19. Save the ```main.tf``` file and focus on variables. Since you are going to use a couple of variables when defining compute resources, you will append the following values into ```variables.tf``` file:
@@ -381,11 +381,11 @@ terraform {
       source  = "hashicorp/random"
       version = "~>3.0"
     }
-    # Add provider for Azure Resource Manager
-    azapi = {
-      source  = "azure/azapi"
-      version = "~>1.5"
-    }
+    ## Add provider for Azure Resource Manager
+    #azapi = {
+    #  source  = "azure/azapi"
+    #  version = "~>1.5"
+    #}
   }
 }
 
@@ -424,16 +424,16 @@ module "network"{
   rg_location = module.resource_group.rg_location
 }
 
-module "compute"{
-  source="./modules/compute"
-  rg_name= module.resource_group.rg_name
-  rg_location = module.resource_group.rg_location
-  rg_id = module.resource_group.rg_id
-  subnet_id = module.network.subnet_id
-  ssh_id = module.randomizer.ssh_id
-  public_ip = module.network.public_ip
-  nsg_id = module.network.nsg_id
-}
+#module "compute"{
+#  source="./modules/compute"
+#  rg_name= module.resource_group.rg_name
+#  rg_location = module.resource_group.rg_location
+#  rg_id = module.resource_group.rg_id
+#  subnet_id = module.network.subnet_id
+#  ssh_id = module.randomizer.ssh_id
+#  public_ip = module.network.public_ip
+#  nsg_id = module.network.nsg_id
+#} 
 
 module "analytics"{
   source="./modules/analytics"
