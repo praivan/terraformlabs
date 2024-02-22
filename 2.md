@@ -42,7 +42,7 @@ cd .> main.tf
 cd .> variables.tf
 cd .> output.tf
 ```
-7. Now you only need to create files for network. Notice that you are not going to create ```variables.tf``` files, since you won't need them. However, we will create ```output.tf``` since we are going to use resource group name and location all throughout the modules. To do so, use the following set of commands:
+7. Now you only need to create files for resource_group. Notice that you are not going to create ```variables.tf``` files, since you won't need them. However, we will create ```output.tf``` since we are going to use resource group name and location all throughout the modules. To do so, use the following set of commands:
 ```
 cd ../resource_group
 cd .> main.tf
