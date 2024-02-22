@@ -210,7 +210,7 @@ output "nsg_id" {
 ## Connect the security group to the network interface
 #resource "azurerm_network_interface_security_group_association" "nsg_to_nic" {
 #  network_interface_id      = azurerm_network_interface.nic1.id
-#  network_security_group_id = azurerm_network_security_group.my_nsg.id
+#  network_security_group_id = var.nsg_id
 #}
 ## Create a virtual machine based on Ubuntu Linux distribution
 #resource "azurerm_linux_virtual_machine" "vm1" {
